@@ -44,19 +44,21 @@ for section in ["/test", "/train"]:
                     lines = f.readlines()
                     img = cv2.imread(source_folder + "/" + folders + "/" + label.split('.')[0] + '.jpg')
                     image_height, image_width, _ = img.shape
+                    label_txt = ''
                     
-                    xmin = float(lines[0].strip().split(' ')[1])
-                    ymin = float(lines[0].strip().split(' ')[2])
-                    xmax = float(lines[0].strip().split(' ')[3])
-                    ymax = float(lines[0].strip().split(' ')[4])
-                    
-                    cx   = ((xmin + xmax)/2.0)/image_width
-                    cy   = ((ymin + ymax)/2.0)/image_height
-                    bw   = (xmax - xmin)/image_width
-                    bh   = (ymax - ymin)/image_height
-                    
-                    print(label_dst + label)
+                    for line in lines:
+                        xmin = float(line.strip().split(' ')[1])
+                        ymin = float(line.strip().split(' ')[2])
+                        xmax = float(line.strip().split(' ')[3])
+                        ymax = float(line.strip().split(' ')[4])
+                        
+                        cx   = ((xmin + xmax)/2.0)/image_width
+                        cy   = ((ymin + ymax)/2.0)/image_height
+                        bw   = (xmax - xmin)/image_width
+                        bh   = (ymax - ymin)/image_height
+                        
+                        label_txt += f'{CLASSES[folders]} {cx} {cy} {bw} {bh}\n'
                     
                     with open(label_dst + label, "w") as wf:
-                        wf.write(f'{CLASSES[folders]} {cx} {cy} {bw} {bh}')
+                        wf.write(label_txt)
 
