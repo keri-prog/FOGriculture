@@ -1,5 +1,5 @@
 # Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
-path: ../datasets/animal_pics  # dataset root dir
+path: ../datasets/animal_pics_reduced  # dataset root dir
 train: images/train  # train images (relative to 'path') 128 images
 val: images/val  # val images (relative to 'path') 128 images
 test:  # test images (optional)
@@ -7,23 +7,18 @@ test:  # test images (optional)
 # Classes 
 names:
   0: Bear
-  1: Bull
-  2: Cattle
-  4: Deer
-  5: Elephant
-  6: Fox
-  7: Goat
-  10: Leopard
-  11: Lion
-  12: Monkey
-  13: Mouse
-  14: Mule
-  15: Raven
-  16: Rhinoceros
-  17: Sheep
-  18: Snake
-  19: Sparrow
-  20: Squirrel
-  21: Tiger
-
+  1: Cattle
+  2: Deer
+  3: Elephant
+  4: Fox
+  5: Goat
+  6: Big_Cat
+  7: Monkey
+  8: Mouse
+  9: Bird
+  10: Rhinoceros
+  11: Snake
+  12: Squirrel
+  13: Rabbits
+  14: Pig
 
