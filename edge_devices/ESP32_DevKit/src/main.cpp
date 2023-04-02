@@ -7,6 +7,7 @@
 #include <U8x8lib.h>
 #include <Adafruit_BMP280.h>
 #include "WiFi.h"
+#include "ESPAsyncWebServer.h"
 
 #ifdef U8X8_HAVE_HW_SPI
 #include <SPI.h>
@@ -25,6 +26,7 @@ DHT dht(DHT_PIN, DHT_TYPE);
 U8X8_SH1106_128X64_NONAME_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);
 Adafruit_BMP280 bmp;
 
+AsyncWebServer server(80);
 
 String readDHTTemperature() {
   float temperature = dht.readTemperature();
@@ -91,6 +93,10 @@ void setup() {
   pinMode(POWER_PIN, OUTPUT); 
   digitalWrite(POWER_PIN, LOW);
 
+  u8x8.begin();
+  u8x8.setPowerSave(0);
+  u8x8.setFont(u8x8_font_chroma48medium8_r);
+
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -102,9 +108,24 @@ void setup() {
 
   Serial.println(WiFi.localIP());
 
-  u8x8.begin();
-  u8x8.setPowerSave(0);
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", index_html, processor);
+  });
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readDHTTemperature().c_str());
+  });
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readDHTHumidity().c_str());
+  });
+  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readBMPPressure().c_str());
+  });
+  server.on("/waterlevel", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readWaterLevel().c_str());
+  });
+
+  server.begin();
+
 }
 
 void loop() {
