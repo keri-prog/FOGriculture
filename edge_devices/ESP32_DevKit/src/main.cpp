@@ -79,6 +79,120 @@ String readWaterLevel() {
   }
 }
 
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style>
+    html {
+     font-family: Arial;
+     display: inline-block;
+     margin: 0px auto;
+     text-align: center;
+    }
+    h2 { font-size: 3.0rem; }
+    p { font-size: 3.0rem; }
+    .units { font-size: 1.2rem; }
+    .dht-labels{
+      font-size: 1.5rem;
+      vertical-align:middle;
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h2>FOGriculture Edge Server</h2>
+  <p>
+    <i class="fas fa-thermometer-half" style="color:#059e8a;"></i> 
+    <span class="dht-labels">Temperature</span> 
+    <span id="temperature">%TEMPERATURE%</span>
+    <sup class="units">&deg;C</sup>
+  </p>
+  <p>
+    <i class="fas fa-tint" style="color:#00add6;"></i> 
+    <span class="dht-labels">Humidity</span>
+    <span id="humidity">%HUMIDITY%</span>
+    <sup class="units">&percnt;</sup>
+  </p>
+  <p>
+    <i class="fas fa-tachometer-alt" style="color:##059e8a;"></i> 
+    <span class="dht-labels">Pressure</span>
+    <span id="pressure">%PRESSURE%</span>
+    <sup class="units">Pa</sup>
+  </p>
+  <p>
+    <i class="fa-solid fa-water" style="color:#00add6;"></i> 
+    <span class="dht-labels">Water Level</span>
+    <span id="waterlevel">%WATERLEVEL%</span>
+    <sup class="units">mm</sup>
+  </p>
+</body>
+<script>
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("temperature").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/temperature", true);
+  xhttp.send();
+}, 10000 ) ;
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("humidity").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/humidity", true);
+  xhttp.send();
+}, 10000 ) ;
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("pressure").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/pressure", true);
+  xhttp.send();
+}, 10000 ) ;
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("waterlevel").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/waterlevel", true);
+  xhttp.send();
+}, 10000 ) ;
+</script>
+</html>)rawliteral";
+
+// Replaces placeholder with DHT values
+String processor(const String& var){
+  //Serial.println(var);
+  if(var == "TEMPERATURE"){
+    return readDHTTemperature();
+  }
+  else if(var == "HUMIDITY"){
+    return readDHTHumidity();
+  }
+  else if(var == "PRESSURE"){
+    return readBMPPressure();
+  }
+  else if(var == "WATERLEVEL"){
+    return readWaterLevel();
+  }
+  return String();
+}
+
 void setup() {
   Serial.begin(115200);
   
@@ -147,4 +261,6 @@ void loop() {
   u8x8.println(pressure);
   u8x8.print("Water: ");
   u8x8.println(value);
+  u8x8.println(WiFi.localIP());
+
 }
