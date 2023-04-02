@@ -21,6 +21,58 @@ DHT dht(DHT_PIN, DHT_TYPE);
 U8X8_SH1106_128X64_NONAME_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);
 Adafruit_BMP280 bmp;
 
+
+String readDHTTemperature() {
+  float temperature = dht.readTemperature();
+  if (isnan(temperature)) {    
+    Serial.println("Failed to read from DHT sensor!");
+    return "--";
+  }
+  else {
+    Serial.println(temperature);
+    return String(temperature);
+  }
+}
+
+String readDHTHumidity() {
+  float humidity = dht.readHumidity();
+  if (isnan(humidity)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return "--";
+  }
+  else {
+    Serial.println(humidity);
+    return String(humidity);
+  }
+}
+
+String readBMPPressure() {
+  float pressure = bmp.readPressure()/100;
+  if (isnan(pressure)) {
+    Serial.println("Failed to read from BMP sensor!");
+    return "--";
+  }
+  else {
+    Serial.println(pressure);
+    return String(pressure);
+  }
+}
+
+String readWaterLevel() {
+  digitalWrite(POWER_PIN, HIGH); 
+  delay(10);                 
+  int value = analogRead(SIGNAL_PIN);
+  digitalWrite(POWER_PIN, LOW);
+  if (isnan(value)) {
+    Serial.println("Failed to read from Water sensor!");
+    return "--";
+  }
+  else {
+    Serial.println(value);
+    return String(value);
+  }
+}
+
 void setup() {
   Serial.begin(115200);
   dht.begin();
@@ -41,15 +93,10 @@ void loop() {
 
   delay(5000);
 
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-
-  float pressure = bmp.readPressure();
-
-  digitalWrite(POWER_PIN, HIGH); 
-  delay(10);                 
-  int value = analogRead(SIGNAL_PIN);
-  digitalWrite(POWER_PIN, LOW);  
+  String temperature = readDHTTemperature();
+  String humidity = readDHTHumidity();
+  String pressure = readBMPPressure();
+  String value = readWaterLevel();
 
   u8x8.clearDisplay();
   u8x8.setCursor(0, 0);
@@ -58,7 +105,7 @@ void loop() {
   u8x8.print("Humidity: ");
   u8x8.println(humidity);
   u8x8.print("Pressure: ");
-  u8x8.println(pressure/100);
+  u8x8.println(pressure);
   u8x8.print("Water: ");
   u8x8.println(value);
 }
