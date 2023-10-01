@@ -18,6 +18,7 @@
 #define DHT_TYPE DHT11
 #define POWER_PIN  25
 #define SIGNAL_PIN 33
+#define BUZZER_PIN 32
 
 const char* ssid = std::getenv("SSID");
 const char* password = std::getenv("PASSWORD");
@@ -205,6 +206,7 @@ void setup() {
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
   pinMode(POWER_PIN, OUTPUT); 
+  pinMode(BUZZER_PIN, OUTPUT); 
   digitalWrite(POWER_PIN, LOW);
 
   u8x8.begin();
@@ -236,6 +238,11 @@ void setup() {
   });
   server.on("/waterlevel", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readWaterLevel().c_str());
+  });
+  server.on("/buzzer", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    if (request->hasParam("state"))
+      digitalWrite(BUZZER_PIN, request->getParam("state")->value().toInt());
+    request->send(200, "text/plain", "OK");
   });
 
   server.begin();
