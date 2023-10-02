@@ -1,3 +1,7 @@
+#user defined folders
+test/
+animal_pics*/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
